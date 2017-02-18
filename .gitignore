@@ -1,0 +1,6 @@
+.DS_Store
+._*
+
+.vagrant
+ubuntu-xenial-*
+decapod
