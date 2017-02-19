@@ -2,7 +2,7 @@
 
 # Edit theset varaibles for your setup
 DECAPOD_PATH=/vagrant/decapod
-DECAPOD_API_ENDPOINT=http:/10.10.10.10:9999
+DECAPOD_API_ENDPOINT=http://10.10.10.10:9999
 DECAPOD_API_TOKEN=26758c32-3421-4f3d-9603-e4b5337e7ecc
 DECAPOD_VERSION_TAG=v0.1.2
 
@@ -45,11 +45,14 @@ sudo systemctl restart cloud-init
 shrimp -u $DECAPOD_API_ENDPOINT cloud-config \
   $DECAPOD_API_TOKEN ~/ansible_ssh_keyfile.pem.pub > ~/user-data
 
+# Move user-data to a better location
+sudo cp ~/user-data /user-data
+
 # Setup for cloud-init to run
 sudo rm -rf /var/lib/cloud/instance /var/lib/cloud/sem/* \
   /var/lib/cloud/seed/nocloud-net/user-data /var/lib/cloud/instances/*
 
 # Run cloud init
-sudo cloud-init -f ~/user-data init
-sudo cloud-init -f ~/user-data modules
-sudo cloud-init -f ~/user-data modules -m final
+sudo cloud-init -f /user-data init
+sudo cloud-init -f /user-data modules
+sudo cloud-init -f /user-data modules -m final
