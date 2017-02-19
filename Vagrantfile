@@ -3,24 +3,15 @@
 
 $bootstrapScript = <<SCRIPT
 # Setup Docker and Docker-compose
-if ! type "docker" > /dev/null; then
-    curl -sSL https://get.docker.com/ | sh
+curl -sSL https://get.docker.com/ | sh
 
-    # Add vagrant user to 
-    usermod -aG docker ubuntu
+# Add vagrant user to 
+usermod -aG docker ubuntu
 
-    # Download docker-compose binary
-    curl -L "https://github.com/docker/compose/releases/download/1.10.0/docker-compose-$(uname -s)-$(uname -m)" \
-        -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
-fi
-
-service docker restart
-SCRIPT
-
-$decapodBuild = <<SCRIPT
-cd /vagrant
-./build.sh
+# Download docker-compose binary
+curl -L "https://github.com/docker/compose/releases/download/1.10.0/docker-compose-$(uname -s)-$(uname -m)" \
+    -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 SCRIPT
 
 VAGRANTFILE_API_VERSION = "2"
@@ -28,8 +19,38 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/xenial64"
 
-  config.vm.network "private_network", ip: "10.10.10.10"
+  # Be nice to the host by only giving each vm half a cpu
+  config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+    v.memory = 1024
+    v.cpus = 1
+  end
 
-  config.vm.provision "shell", inline: $bootstrapScript, preserve_order: true
-  config.vm.provision "shell", inline: $decapodBuild, privileged: false, preserve_order: true
+  config.vm.define "decapod" do |node|
+    node.vm.hostname = "decapod"
+    node.vm.network "private_network", ip: "10.10.10.10"
+
+    node.vm.provision "shell", inline: $bootstrapScript
+  end
+
+  config.vm.define "ceph1" do |node|
+      node.vm.hostname = "ceph1"
+      node.vm.network "private_network", ip: "10.10.10.11"
+
+      node.vm.provision "shell", path: "add_server.sh", privileged: false
+  end
+
+  config.vm.define "ceph2" do |node|
+      node.vm.hostname = "ceph2"
+      node.vm.network "private_network", ip: "10.10.10.12"
+
+      node.vm.provision "shell", path: "add_server.sh", privileged: false
+  end
+
+  config.vm.define "ceph3" do |node|
+      node.vm.hostname = "ceph3"
+      node.vm.network "private_network", ip: "10.10.10.13"
+
+      node.vm.provision "shell", path: "add_server.sh", privileged: false
+  end
 end
