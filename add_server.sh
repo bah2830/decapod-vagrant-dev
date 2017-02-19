@@ -4,6 +4,18 @@
 DECAPOD_PATH=/vagrant/decapod
 DECAPOD_API_ENDPOINT=http:/10.10.10.10:9999
 DECAPOD_API_TOKEN=26758c32-3421-4f3d-9603-e4b5337e7ecc
+DECAPOD_VERSION_TAG=v0.1.2
+
+# Clone decapod if it isn't already'
+if [ ! -d "/vagrant/decapod" ]; then
+    git clone --recurse-submodules https://github.com/Mirantis/ceph-lcm.git decapod
+fi
+
+# Move into the decapod directory
+cd decapod
+
+# Checkout a specific version
+git checkout $DECAPOD_VERSION_TAG && git submodule update --init --recursive
 
 # Don't make any changes below
 cd $DECAPOD_PATH
