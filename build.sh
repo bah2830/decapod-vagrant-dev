@@ -18,11 +18,15 @@ fi
 cd decapod
 
 # Change the base image 
-sed -i 's/FROM docker-prod-virtual.docker.mirantis.net/ubuntu:xenial/FROM ubuntu:xenial/g' containerization/backend-base.dockerfile
-sed -i 's/FROM docker-prod-virtual.docker.mirantis.net/nginx:stable/FROM nginx:stable/g' containerization/frontend.dockerfile
+sed -i 's/docker-prod-virtual.docker.mirantis.net\///g' containerization/*
 
 # Build decapod images.
 make build_containers_dev
 
 # Run containers 
 docker-compose up -d
+
+sleep 10
+
+# Run migrations
+docker-compose exec admin decapod-admin migration apply
