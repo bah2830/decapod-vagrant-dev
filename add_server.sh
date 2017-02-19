@@ -20,7 +20,8 @@ sudo apt-get install -y cloud-init python-pip make \
 pip install setuptools
 
 # Generate public key based on known private key
-ssh-keygen -y -f ansible_ssh_keyfile.pem > ~/ansible_ssh_keyfile.pem.pub
+chmod 0600 containerization/files/devconfigs/ansible_ssh_keyfile.pem
+ssh-keygen -y -f containerization/files/devconfigs/ansible_ssh_keyfile.pem > ~/ansible_ssh_keyfile.pem.pub
 chmod 0600 ~/ansible_ssh_keyfile.pem.pub
 
 # Build the decapod cli image
@@ -34,8 +35,12 @@ sudo systemctl enable cloud-init
 sudo systemctl restart cloud-init
 
 # Get the cloud-init user data for OS deployment
+rm ~/user-data
 decapod -u $DECAPOD_API_ENDPOINT cloud-config \
   $DECAPOD_API_TOKEN ~/ansible_ssh_keyfile.pem.pub > ~/user-data
+
+# Remove some bad requests from user-data
+sed -i '/metadata_ip = get_response/,+3d' ~/user-data
 
 # Move user-data to a better location
 sudo cp ~/user-data /user-data
