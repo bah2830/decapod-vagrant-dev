@@ -1,7 +1,5 @@
 #!/bin/sh
 
-DECAPOD_VERSION_TAG=v0.1.2
-
 # Add nodejs repo if not already installed
 if ! type "node" > /dev/null; then
     curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
@@ -19,11 +17,16 @@ fi
 # Move into the decapod directory
 cd decapod
 
-# Checkout a specific version
-git checkout $DECAPOD_VERSION_TAG && git submodule update --init --recursive
+# Change the base image 
+sed -i 's/docker-prod-virtual.docker.mirantis.net\///g' containerization/*
 
 # Build decapod images.
 make build_containers_dev
 
 # Run containers 
 docker-compose up -d
+
+sleep 10
+
+# Run migrations
+docker-compose exec admin decapod-admin migration apply
