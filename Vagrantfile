@@ -36,21 +36,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "ceph1" do |node|
       node.vm.hostname = "ceph1"
       node.vm.network "private_network", ip: "10.10.10.11"
-
-      node.vm.provision "shell", path: "add_server.sh", privileged: false
   end
 
   config.vm.define "ceph2" do |node|
       node.vm.hostname = "ceph2"
       node.vm.network "private_network", ip: "10.10.10.12"
-
-      node.vm.provision "shell", path: "add_server.sh", privileged: false
   end
 
   config.vm.define "ceph3" do |node|
       node.vm.hostname = "ceph3"
       node.vm.network "private_network", ip: "10.10.10.13"
-
-      node.vm.provision "shell", path: "add_server.sh", privileged: false
   end
 end

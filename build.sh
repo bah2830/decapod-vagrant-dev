@@ -18,6 +18,7 @@ fi
 cd decapod
 
 # Change the base image 
+sed -i 's/docker-prod-virtual.docker.mirantis.net\///g' containerization/*.*
 sed -i 's/docker-prod-virtual.docker.mirantis.net\///g' containerization/*
 
 # Build decapod images.
