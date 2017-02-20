@@ -19,32 +19,28 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/xenial64"
 
-  # Be nice to the host by only giving each vm half a cpu
-  config.vm.provider "virtualbox" do |v|
-    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
-    v.memory = 1024
-    v.cpus = 1
-  end
-
   config.vm.define "decapod" do |node|
     node.vm.hostname = "decapod"
     node.vm.network "private_network", ip: "10.10.10.10"
 
+    node.vm.provider "virtualbox" do |vb|
+      vb.memory = 4096
+      vb.cpus   = 3
+    end
+
     node.vm.provision "shell", inline: $bootstrapScript
   end
 
-  config.vm.define "ceph1" do |node|
-      node.vm.hostname = "ceph1"
-      node.vm.network "private_network", ip: "10.10.10.11"
-  end
+  ["ceph1", "ceph2", "ceph3"].each_with_index do |host, idx|
+    config.vm.define "#{host}" do |node|
+      node.vm.hostname = "#{host}"
+      node.vm.network "private_network", ip: "10.10.10.2#{idx}"
 
-  config.vm.define "ceph2" do |node|
-      node.vm.hostname = "ceph2"
-      node.vm.network "private_network", ip: "10.10.10.12"
-  end
-
-  config.vm.define "ceph3" do |node|
-      node.vm.hostname = "ceph3"
-      node.vm.network "private_network", ip: "10.10.10.13"
+      node.vm.provider "virtualbox" do |vb|
+        vb.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+        vb.memory = 512
+        vb.cpus   = 1
+      end
+    end
   end
 end
