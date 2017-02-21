@@ -14,8 +14,8 @@ cd decapod
 
 # Install some prereqs
 sudo apt-get update
-sudo apt-get install -y cloud-init python-pip make \
-    python-dev libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev
+sudo apt-get install -y python-pip make python-dev libffi-dev \
+  libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev
 
 pip install setuptools
 
@@ -30,26 +30,15 @@ if ! type "decapod" > /dev/null; then
   pip install output/eggs/decapodlib*.whl output/eggs/decapod_cli*.whl
 fi
 
-# Setup cloud-init for boot
-sudo systemctl enable cloud-init
-sudo systemctl restart cloud-init
-
 # Get the cloud-init user data for OS deployment
-rm ~/user-data
+echo "Generating cloud-init-user-data.new"
+rm -f cloud-init-user-data.new
 decapod -u $DECAPOD_API_ENDPOINT cloud-config \
-  $DECAPOD_API_TOKEN ~/ansible_ssh_keyfile.pem.pub > ~/user-data
+  $DECAPOD_API_TOKEN ~/ansible_ssh_keyfile.pem.pub > ./cloud-init-user-data.new
 
 # Remove some bad requests from user-data
-sed -i '/metadata_ip = get_response/,+3d' ~/user-data
+echo "Editing cloud-init-user-data.new"
+sed -i '/metadata_ip = get_response/,+3d' ./cloud-init-user-data.new
 
-# Move user-data to a better location
-sudo cp ~/user-data /user-data
-
-# Setup for cloud-init to run
-sudo rm -rf /var/lib/cloud/instance /var/lib/cloud/sem/* \
-  /var/lib/cloud/seed/nocloud-net/user-data /var/lib/cloud/instances/*
-
-# Run cloud init
-sudo cloud-init -f /user-data init
-sudo cloud-init -f /user-data modules
-sudo cloud-init -f /user-data modules -m final
+cp -f cloud-init-user-data.new cloud-init-user-data
+rm -f cloud-init-user-data.new

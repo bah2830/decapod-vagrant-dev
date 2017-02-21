@@ -1,0 +1,41 @@
+version: "2"
+services:
+  frontend:
+    image: bah2830/decapod_frontend:latest
+    links:
+      - api
+    ports:
+      - "9999:80"
+      - "10000:443"
+    restart: always
+  api:
+    image: bah2830/decapod_api:latest
+    links:
+      - database
+    restart: "on-failure:5"
+  controller:
+    image: bah2830/decapod_controller:latest
+    links:
+      - database
+    restart: "on-failure:5"
+    volumes:
+      - "./ansible_ssh_keyfile.pem:/root/.ssh/id_rsa:ro"
+  database:
+    image: bah2830/decapod_db:latest
+    volumes_from:
+      - database_data
+    restart: always
+  database_data:
+    image: bah2830/decapod_db_data:latest
+    volumes:
+      - /data/db
+  admin:
+    image: bah2830/decapod_admin:latest
+    links:
+      - database
+    volumes:
+      - "./ansible_ssh_keyfile.pem:/root/.ssh/id_rsa:ro"
+    restart: "on-failure:3"
+    ports:
+      - "10001:8000"
+      - "9998:8001"

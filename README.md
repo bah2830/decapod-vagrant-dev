@@ -16,26 +16,27 @@ Vagrant will provision 4 vms. One vm for decapod itself and three others to be u
  - docker-compose
  
 
-## Deploy Decapod
+## Build Decapod From Source
 ### With Vagrant
  - `vagrant up decapod`
    - deployment will take up to an hour to build the decapod containers
  - `vagrant ssh decapod`
  - `cd /vagrant`
- - `./build.sh`
+ - `./build_images.sh`
 
 ### Without Vagrant  
 This will deploy only decapod on the current host using docker. It will bypass all vagrant requirements.
- - `./deploy.sh`
+ - `./build_images.sh`
+
 
 ## Adding Server To Cluster
  - Log into base setup of any node 
- - `./add_server.sh` 
-   - If needed edit the varaibles at the top of the script for your setup 
+ - `./provision_node.sh` 
+  
+### Generating new cloud init data from decapod
+ - `./generate_cloud_init_data.sh`
 
-### Using Vagrant
-  - `vagrant up ceph1 ceph2 ceph3`
-
+ 
 ## Login
 Login at https://10.10.10.10:10000
  - username: root
