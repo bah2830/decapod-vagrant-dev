@@ -2,6 +2,6 @@
 ._*
 
 .vagrant
-.cloud-init-user-data
+cloud-init-user-data
 ubuntu-xenial-*
 decapod

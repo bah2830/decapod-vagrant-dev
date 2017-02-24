@@ -22,21 +22,25 @@ Vagrant will provision 4 vms. One vm for decapod itself and three others to be u
    - deployment will take up to an hour to build the decapod containers
  - `vagrant ssh decapod`
  - `cd /vagrant`
- - `./build_images.sh`
+ - `./deploy_decapod.sh`
 
 ### Without Vagrant  
 This will deploy only decapod on the current host using docker. It will bypass all vagrant requirements.
- - `./build_images.sh`
+ - `./deploy_decapod.sh`
+
+
+## Generating new cloud init data
+ - `./generate_cloud_init_data.sh`
 
 
 ## Adding Server To Cluster
- - Log into base setup of any node 
- - `./provision_node.sh` 
+ - From host with docker installed `./generate_cloud_init_data.sh`
+ - Copy cloud-init-user-data to new node
+ - In new node run `./provision_node.sh` 
   
-### Generating new cloud init data from decapod
- - `./generate_cloud_init_data.sh`
 
- 
+
+
 ## Login
 Login at https://10.10.10.10:10000
  - username: root
