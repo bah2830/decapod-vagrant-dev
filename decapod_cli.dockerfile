@@ -22,5 +22,4 @@ RUN make build_eggs \
 
 CMD rm -f /data/cloud-init-user-data \
     && decapod -u $DECAPOD_API_ENDPOINT cloud-config \
-        $DECAPOD_API_TOKEN ~/ansible_ssh_keyfile.pem.pub > /data/cloud-init-user-data \
-    && sed -i '/metadata_ip = get_response/,+3d' /data/cloud-init-user-data
+        $DECAPOD_API_TOKEN ~/ansible_ssh_keyfile.pem.pub > /data/cloud-init-user-data
